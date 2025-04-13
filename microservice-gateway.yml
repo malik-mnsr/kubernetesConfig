@@ -1,44 +1,39 @@
 eureka:
   client:
     service-url:
-      defaultZone: http://eureka-server.default.svc.cluster.local:8761/eureka
+      defaultZone: http://eureka-server.default.svc.cluster.local:8761/eureka/ 
     fetch-registry: true
     register-with-eureka: true
+    healthcheck:
+      enabled: true  
 
 spring:
-  application:
-    name: api-gateway
   cloud:
     gateway:
       discovery:
         locator:
           enabled: true
           lower-case-service-id: true
-      globalcors:
-        cors-configurations:
-          '[/**]':
-            allowedOrigins: "*"
-            allowedMethods: "*"
-            allowedHeaders: "*"
       routes:
         - id: microservice-authentification
-          uri: lb://microservice-authentification
+          uri: lb://microservice-authentification  
           predicates:
-            - Path=/authentification/**
+            - Path=/api/auth/**  
           filters:
-            - RewritePath=/authentification/(?<path>.*), /$\{path}
-        
+            - StripPrefix=1  
+            
         - id: microservice-logement
           uri: lb://microservice-logement
           predicates:
-            - Path=/logement/**
+            - Path=/api/logement/**  
           filters:
-            - RewritePath=/logement/(?<path>.*), /$\{path}
-        
+            - StripPrefix=1
+            
+        # OpenAPI/Swagger config (updated for Kubernetes)
         - id: openapi
-          uri: http://localhost:${server.port}
+          uri: http://api-gateway:${server.port} 
           predicates:
-            - Path=/v3/api-docs/**,/swagger-ui/**,/swagger-ui.html
+            - Path=/v3/api-docs/**,/swagger-ui/**
 
 server:
   port: 8888
@@ -48,8 +43,11 @@ management:
     web:
       exposure:
         include: "*"
+      cors:
+        allowed-origins: "*"  
+        allowed-methods: "*"
   endpoint:
-    gateway:
-      enabled: true
     health:
       show-details: always
+    gateway:
+      enabled: true
