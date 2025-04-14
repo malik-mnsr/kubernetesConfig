@@ -1,39 +1,59 @@
 eureka:
   client:
     service-url:
-      defaultZone: http://eureka-server.default.svc.cluster.local:8761/eureka/ 
+      defaultZone: http://eureka-server.default.svc.cluster.local:8761/eureka/
     fetch-registry: true
     register-with-eureka: true
     healthcheck:
       enabled: true  
 
 spring:
+  application:
+    name: api-gateway  
   cloud:
     gateway:
       discovery:
         locator:
           enabled: true
           lower-case-service-id: true
+      globalcors: 
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
       routes:
+        
         - id: microservice-authentification
-          uri: lb://microservice-authentification  
+          uri: lb://microservice-authentification
           predicates:
-            - Path=/api/auth/**  
+            - Path=/api/auth/**,/authentification/**  
           filters:
-            - StripPrefix=1  
-            
+            - StripPrefix=1 
+            - RewritePath=/authentification/(?<path>.*), /$\{path}
+
+       
         - id: microservice-logement
           uri: lb://microservice-logement
           predicates:
-            - Path=/api/logement/**  
+            - Path=/api/logement/**,/logement/** 
           filters:
             - StripPrefix=1
-            
-        # OpenAPI/Swagger config (updated for Kubernetes)
+            - RewritePath=/logement/(?<path>.*), /$\{path}
+
+       
+        - id: payment-microservice
+          uri: lb://payment-microservice
+          predicates:
+            - Path=/payment/**
+          filters:
+            - RewritePath=/payment/(?<path>.*), /$\{path}
+
+       
         - id: openapi
           uri: http://api-gateway:${server.port} 
           predicates:
-            - Path=/v3/api-docs/**,/swagger-ui/**
+            - Path=/v3/api-docs/**,/swagger-ui/**,/swagger-ui.html  
 
 server:
   port: 8888
@@ -43,8 +63,8 @@ management:
     web:
       exposure:
         include: "*"
-      cors:
-        allowed-origins: "*"  
+      cors:  # From new config
+        allowed-origins: "*"
         allowed-methods: "*"
   endpoint:
     health:
