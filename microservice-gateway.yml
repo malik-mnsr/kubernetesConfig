@@ -19,24 +19,9 @@ spring:
       globalcors: 
         cors-configurations:
           '[/**]':
-            allowedOrigins: 
-              - "http://aziz.com"
-              - "http://www.aziz.com"
-              - "http://localhost:4200"  # For development
-            allowedMethods: 
-              - GET
-              - POST
-              - PUT
-              - DELETE
-              - OPTIONS
-            allowedHeaders: 
-              - Content-Type
-              - Authorization
-              - X-Requested-With
-              - Accept
-              - Origin
-            allowCredentials: true
-            maxAge: 3600
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
       routes:
         
         - id: microservice-authentification
@@ -69,7 +54,7 @@ spring:
           uri: http://api-gateway:${server.port} 
           predicates:
             - Path=/v3/api-docs/**,/swagger-ui/**,/swagger-ui.html  
-        
+
 server:
   port: 8888
 
@@ -78,11 +63,9 @@ management:
     web:
       exposure:
         include: "*"
-      cors:
-        allowed-origins: 
-          - "http://localhost:8080"  # For actuator access
+      cors:  # From new config
+        allowed-origins: "*"
         allowed-methods: "*"
-        allowed-headers: "*"
   endpoint:
     health:
       show-details: always
