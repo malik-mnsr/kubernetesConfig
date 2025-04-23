@@ -27,7 +27,7 @@ spring:
       routes:
         
         - id: microservice-authentification
-          uri: lb://microservice-authentification
+          uri: lb://authentification-service.default.svc.cluster.local:8888
           predicates:
             - Path=/api/auth/**,/authentification/**  
           filters:
@@ -36,7 +36,7 @@ spring:
 
        
         - id: microservice-logement
-          uri: lb://microservice-logement
+          uri: lb://ter-logement-service.default.svc.cluster.local:8888
           predicates:
             - Path=/api/logement/**,/logement/** 
           filters:
