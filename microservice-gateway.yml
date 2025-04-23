@@ -26,7 +26,7 @@ spring:
             exposedHeaders: "Authorization"  
       routes:
         
-        - id: microservice-authentification
+        - id: authentification-service
           uri: lb://authentification-service.default.svc.cluster.local:8888
           predicates:
             - Path=/api/auth/**,/authentification/**  
@@ -35,7 +35,7 @@ spring:
             - RewritePath=/authentification/(?<path>.*), /$\{path}
 
        
-        - id: microservice-logement
+        - id: ter-logement-service
           uri: lb://ter-logement-service.default.svc.cluster.local:8888
           predicates:
             - Path=/api/logement/**,/logement/** 
